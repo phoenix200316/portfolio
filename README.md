@@ -1,32 +1,51 @@
 # Jude Diniz Portfolio
 
-A polished personal portfolio website for Jude Diniz, designed for a graduate software developer and IT professional.
+A polished personal portfolio website for Jude Diniz, crafted for graduate software developer, web developer, and IT support opportunities.
 
-## Project Description
+## Overview
 
-This repository contains a production-ready portfolio website built with HTML, CSS, and JavaScript. It includes professional branding, a dark glassmorphism interface, responsive layouts, animated interactions, and sections for experience, education, academic projects, a learning roadmap, and contact details.
+This repository contains a responsive, production-ready portfolio built with HTML, CSS, and JavaScript. The design is modern, accessible, and optimized for GitHub Pages deployment.
 
 ## Features
 
-- Responsive, mobile-first layout
-- Dark theme with blue glassmorphism accents
-- Smooth scroll reveal animations
-- Animated role text in the hero section
-- Interactive navigation and mobile menu
-- Professional academic project summaries
-- Contact form that opens a prefilled email draft
-- GitHub and LinkedIn integration
-- GitHub Pages compatible static deployment
+- Clean dark theme with blue gradients and glassmorphism
+- Professional responsive layout for desktop, tablet, and mobile
+- Typed hero animation and scroll reveal effects
+- Simplified sticky navigation for recruiter focus
+- Accessible form design with ARIA support and fallback
+- Academic project showcase and featured project placeholders
+- Technical skills section with progress indicators
+- Modern work timeline and education summary
+- GitHub section for profile activity placeholders
+- SEO metadata, Open Graph, and structured data
+
+## Technologies
+
+- HTML5
+- CSS3
+- JavaScript
+- Google Fonts
+- Font Awesome Icons
+
+## Folder Structure
+
+- `index.html` — Main portfolio page
+- `assets/css/style.css` — Visual styling and responsive layout
+- `assets/js/script.js` — Interactive behavior and form handling
+- `assets/images/` — Portfolio image assets and icons
+- `assets/files/` — Downloadable CV file
+- `README.md` — Project documentation
+- `LICENSE` — MIT license
 
 ## Installation
 
-1. Clone the repository:
+Clone the repository:
 
 ```bash
 git clone https://github.com/phoenix200316/portfolio.git
 ```
 
-2. Change into the project directory:
+Change into the project directory:
 
 ```bash
 cd portfolio
@@ -34,7 +53,7 @@ cd portfolio
 
 ## Running Locally
 
-Open `index.html` in a browser, or use a local development server:
+Open `index.html` directly in a browser, or use a local server:
 
 ```bash
 npx serve .
@@ -42,42 +61,44 @@ npx serve .
 
 Then visit the local server address shown in the terminal.
 
-## Folder Structure
+## Deployment
 
-- `index.html` � Main portfolio page
-- `assets/css/style.css` � Portfolio styles
-- `assets/js/script.js` � Interactive behavior
-- `assets/images/` � Portfolio image assets and icons
-- `assets/files/` — Downloadable CV file (ensure the file exists for the CV link)
-- `README.md` � Project documentation
-- `LICENSE` � Project license
+This site is ready for GitHub Pages deployment. Ensure the repository is published from the `main` branch or the branch configured for Pages.
 
-## Technologies Used
+### GitHub Pages Setup
 
-- HTML5
-- CSS3
-- JavaScript
-- Google Fonts
-- Font Awesome icons
+1. Go to your repository settings.
+2. Under Pages, select the `main` branch and `/ (root)` folder.
+3. Save and wait for the site to publish.
+
+The `.nojekyll` file is included so GitHub Pages will serve the static site without Jekyll processing.
+
+## Contact Form Setup
+
+The contact form is preconfigured for Formspree, but it requires a valid Formspree form ID:
+
+1. Create a free account at https://formspree.io/.
+2. Add a new form and configure delivery to `dinizjude@gmail.com`.
+3. Replace `your-form-id` in the `action` attribute of the `<form>` element in `index.html`.
+
+If the form action is not configured yet, the site will fallback to opening the default email client.
 
 ## Future Improvements
 
-- Add real personal project pages and live demos
-- Integrate GitHub statistics dynamically
-- Implement a backend-powered contact form
+- Add real portfolio project screenshots and case studies
+- Replace project placeholders with published project links
+- Integrate GitHub activity widgets or API cards
 - Add a blog or case study section
-- Include more visual portfolio case studies
-
-## License
-
-This project is released under the MIT License.
+- Connect to a backend contact solution or serverless function
 
 ## Author
 
 Jude Diniz
 
-Contact: dinizjude@gmail.com
+- Email: dinizjude@gmail.com
+- GitHub: https://github.com/phoenix200316
+- LinkedIn: https://linkedin.com/in/jude-diniz-57226b3b7
 
-GitHub: https://github.com/phoenix200316
+## License
 
-LinkedIn: https://linkedin.com/in/jude-diniz-57226b3b7
+This project is released under the MIT License.

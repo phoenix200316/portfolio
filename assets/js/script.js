@@ -1,11 +1,14 @@
-// Portfolio interactive behavior
-
 const navToggle = document.querySelector('.nav-toggle');
-const navList = document.querySelector('.nav-list');
-const typedText = document.querySelector('.hero-typed-text');
+const mobileNav = document.getElementById('mobile-nav');
+const navLinks = document.querySelectorAll('.nav-list a');
+let mobileNavLinks = [];
+const typedText = document.querySelector('.typed-text');
 const contactForm = document.getElementById('contact-form');
+const contactFeedback = document.getElementById('contact-feedback');
 const currentYear = document.getElementById('current-year');
 const revealElements = document.querySelectorAll('.reveal');
+const header = document.getElementById('site-header');
+const sections = document.querySelectorAll('main section[id]');
 
 const roles = [
   'Software Developer',
@@ -19,18 +22,14 @@ const roles = [
 let roleIndex = 0;
 let charIndex = 0;
 let isDeleting = false;
-
 const typeSpeed = 80;
-const deleteSpeed = 40;
+const deleteSpeed = 35;
 const pauseDelay = 1200;
 
 function typeRole() {
   if (!typedText) return;
-
   const currentRole = roles[roleIndex];
-  const displayedText = currentRole.slice(0, charIndex);
-
-  typedText.textContent = displayedText;
+  typedText.textContent = currentRole.slice(0, charIndex);
 
   if (!isDeleting && charIndex < currentRole.length) {
     charIndex += 1;
@@ -56,42 +55,179 @@ function updateYear() {
   }
 }
 
-function attachMobileNavListeners() {
-  if (!navToggle || !navList) return;
+function toggleMobileNav() {
+  if (!navToggle || !mobileNav) return;
+  const expanded = navToggle.getAttribute('aria-expanded') === 'true';
+  navToggle.setAttribute('aria-expanded', String(!expanded));
+  mobileNav.classList.toggle('active');
+  mobileNav.setAttribute('aria-hidden', String(!mobileNav.classList.contains('active')));
+}
 
-  navToggle.addEventListener('click', () => {
-    const expanded = navToggle.getAttribute('aria-expanded') === 'true';
-    navToggle.setAttribute('aria-expanded', String(!expanded));
-    navList.classList.toggle('active');
-  });
+function closeMobileNav() {
+  if (!navToggle || !mobileNav) return;
+  navToggle.setAttribute('aria-expanded', 'false');
+  mobileNav.classList.remove('active');
+  mobileNav.setAttribute('aria-hidden', 'true');
+}
 
-  navList.querySelectorAll('a').forEach((link) => {
-    link.addEventListener('click', () => {
-      navList.classList.remove('active');
-      navToggle.setAttribute('aria-expanded', 'false');
-    });
+function updateHeader() {
+  if (!header) return;
+  header.classList.toggle('shrink', window.scrollY > 30);
+}
+
+function updateActiveSection() {
+  const offset = window.innerHeight * 0.3;
+  sections.forEach((section) => {
+    const top = section.getBoundingClientRect().top;
+    const sectionId = section.id;
+    const isActive = top <= offset && top >= -section.offsetHeight + offset;
+    const link = document.querySelector(`.nav-list a[href="#${sectionId}"]`);
+    const mobileLink = document.querySelector(`.mobile-nav-list a[href="#${sectionId}"]`);
+    if (link) link.classList.toggle('active', isActive);
+    if (mobileLink) mobileLink.classList.toggle('active', isActive);
   });
 }
 
-function handleContactForm() {
-  if (!contactForm) return;
+function attachMobileNav() {
+  if (!navToggle || !mobileNav) return;
 
-  contactForm.addEventListener('submit', (event) => {
-    event.preventDefault();
+  // Build mobile nav from desktop links to avoid duplicated visible markup
+  function buildMobileNav() {
+    const mainNavList = document.querySelector('.nav-list');
+    if (!mainNavList || !mobileNav) return;
+    mobileNav.innerHTML = '';
+    const clone = mainNavList.cloneNode(true);
+    clone.classList.remove('nav-list');
+    clone.classList.add('mobile-nav-list');
+    mobileNav.appendChild(clone);
+    mobileNavLinks = mobileNav.querySelectorAll('.mobile-nav-list a');
+    // Attach click handlers to newly created mobile links to close menu on navigation
+    mobileNavLinks.forEach((link) => {
+      link.addEventListener('click', () => closeMobileNav());
+    });
+  }
 
-    const name = document.getElementById('contact-name')?.value.trim() || 'A visitor';
-    const email = document.getElementById('contact-email')?.value.trim() || 'Not provided';
-    const phone = document.getElementById('contact-phone')?.value.trim() || 'Not provided';
-    const message = document.getElementById('contact-message')?.value.trim() || '';
+  buildMobileNav();
 
-    const subject = encodeURIComponent(`Portfolio inquiry from ${name}`);
-    const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nPhone: ${phone}\n\n${message}`);
-    window.location.href = `mailto:dinizjude@gmail.com?subject=${subject}&body=${body}`;
+  navToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleMobileNav();
   });
+
+  // mobile link handlers are attached during buildMobileNav()
+
+  // Close when clicking outside the mobile nav
+  document.addEventListener('click', (e) => {
+    if (!mobileNav.classList.contains('active')) return;
+    if (!mobileNav.contains(e.target) && !navToggle.contains(e.target)) {
+      closeMobileNav();
+    }
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMobileNav();
+  });
+
+  // Ensure mobile menu is closed on resize to desktop
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 768) {
+      closeMobileNav();
+      // rebuild to ensure no stale state
+      buildMobileNav();
+    }
+  });
+}
+
+function handleContactSubmission(event) {
+  if (!contactForm) return;
+  event.preventDefault();
+
+  const name = document.getElementById('contact-name')?.value.trim();
+  const email = document.getElementById('contact-email')?.value.trim();
+  const phone = document.getElementById('contact-phone')?.value.trim();
+  const message = document.getElementById('contact-message')?.value.trim();
+  const submitButton = contactForm.querySelector('button[type="submit"]');
+
+  if (!name || !email || !message) {
+    contactFeedback.textContent = 'Please complete all required fields before sending.';
+    contactFeedback.classList.remove('success');
+    contactFeedback.classList.add('error');
+    return;
+  }
+
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(email)) {
+    contactFeedback.textContent = 'Please enter a valid email address.';
+    contactFeedback.classList.remove('success');
+    contactFeedback.classList.add('error');
+    return;
+  }
+
+  contactFeedback.textContent = '';
+  contactFeedback.classList.remove('error', 'success');
+
+  const hasPlaceholderAction = contactForm.action.includes('your-form-id');
+
+  if (hasPlaceholderAction) {
+    const subject = encodeURIComponent(`Portfolio inquiry from ${name}`);
+    const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nPhone: ${phone || 'Not provided'}\n\n${message}`);
+    window.location.href = `mailto:dinizjude@gmail.com?subject=${subject}&body=${body}`;
+    contactFeedback.textContent = 'Your email client is opening so you can send your message directly.';
+    contactFeedback.classList.remove('error');
+    contactFeedback.classList.add('success');
+    return;
+  }
+
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.textContent = 'Sending...';
+  }
+
+  const replyToInput = contactForm.querySelector('input[name="_replyto"]');
+  if (replyToInput) replyToInput.value = email;
+
+  fetch(contactForm.action, {
+    method: 'POST',
+    body: new FormData(contactForm),
+    headers: {
+      Accept: 'application/json'
+    }
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.ok || data.success) {
+        contactFeedback.textContent = 'Message sent successfully. Thank you!';
+        contactFeedback.classList.remove('error');
+        contactFeedback.classList.add('success');
+        contactForm.reset();
+      } else {
+        throw new Error(data.error || 'Unable to send message');
+      }
+    })
+    .catch(() => {
+      contactFeedback.textContent = 'There was an issue sending your message. Please try again later or use email.';
+      contactFeedback.classList.remove('success');
+      contactFeedback.classList.add('error');
+    })
+    .finally(() => {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Send Message';
+      }
+    });
+}
+
+function setupContactForm() {
+  if (!contactForm) return;
+  contactForm.addEventListener('submit', handleContactSubmission);
 }
 
 function createScrollReveal() {
-  if (!revealElements.length) return;
+  if (!window.IntersectionObserver || !revealElements.length) {
+    revealElements.forEach((element) => element.classList.add('reveal-visible'));
+    return;
+  }
 
   const observer = new IntersectionObserver(
     (entries, observerInstance) => {
@@ -110,8 +246,15 @@ function createScrollReveal() {
 
 window.addEventListener('DOMContentLoaded', () => {
   updateYear();
-  attachMobileNavListeners();
-  handleContactForm();
+  attachMobileNav();
+  setupContactForm();
   createScrollReveal();
   typeRole();
+  updateHeader();
+  updateActiveSection();
+});
+
+window.addEventListener('scroll', () => {
+  updateHeader();
+  updateActiveSection();
 });
