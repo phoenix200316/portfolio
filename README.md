@@ -95,6 +95,15 @@ npm start
 
 - Submit the contact form on the site root or POST to `/submit-contact`.
 - Download collected contacts: GET `/download-contacts` (downloads `assets/contact info.csv`).
+ - Admin UI: GET `/admin` (protected by Basic Auth). Set environment variables `ADMIN_USER` and `ADMIN_PASS` before running the server, for example:
+
+```powershell
+setx ADMIN_USER "admin"
+setx ADMIN_PASS "yourpassword"
+npm start
+```
+
+Then open `http://localhost:5001/admin` and authenticate with the credentials.
 
 ## Future Improvements
 

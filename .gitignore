@@ -1,0 +1,6 @@
+node_modules/
+.env
+db.sqlite
+assets/contact-meta.json
+contacts_download.csv
+*.log

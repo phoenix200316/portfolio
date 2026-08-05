@@ -1,267 +1,750 @@
-const navToggle = document.querySelector('.nav-toggle');
-const mobileNav = document.getElementById('mobile-nav');
-const navLinks = document.querySelectorAll('.nav-list a');
-let mobileNavLinks = [];
-const typedText = document.querySelector('.typed-text');
-const contactForm = document.getElementById('contact-form');
-const contactFeedback = document.getElementById('contact-feedback');
-const currentYear = document.getElementById('current-year');
-const revealElements = document.querySelectorAll('.reveal');
-const header = document.getElementById('site-header');
-const sections = document.querySelectorAll('main section[id]');
+/* =====================================================
+   JUDE DINIZ PORTFOLIO
+   Version 2.0
+===================================================== */
+
+/* =====================================================
+   DOM ELEMENTS
+===================================================== */
+
+const header = document.querySelector(".site-header");
+
+const navToggle = document.querySelector(".nav-toggle");
+
+const mobileNav = document.querySelector(".mobile-nav");
+
+const navLinks = document.querySelectorAll(".main-nav a");
+
+const mobileLinks = document.querySelectorAll(".mobile-nav a");
+
+const sections = document.querySelectorAll("section[id]");
+
+const currentYear = document.getElementById("current-year");
+
+const typingElement = document.querySelector(".typing-text");
+
+const backToTop = document.querySelector(".back-to-top");
+
+const revealElements = document.querySelectorAll(
+".reveal,.fade-left,.fade-right,.zoom"
+);
+
+/* =====================================================
+   TYPING TEXT
+===================================================== */
 
 const roles = [
-  'Software Developer',
-  'Web Developer',
-  'Computer Science Graduate',
-  'IT Support Professional',
-  'Problem Solver',
-  'Lifelong Learner'
+
+"Software Developer",
+
+"Computer Science Graduate",
+
+"Web Developer",
+
+"IT Support",
+
+"Digital Forensics Enthusiast",
+
+"Cyber Security Learner"
+
 ];
 
-const localFormEndpoint = 'http://localhost:5001/submit-contact';
+/* =====================================================
+   GLOBAL VARIABLES
+===================================================== */
 
 let roleIndex = 0;
-let charIndex = 0;
-let isDeleting = false;
-const typeSpeed = 80;
-const deleteSpeed = 35;
-const pauseDelay = 1200;
 
-function typeRole() {
-  if (!typedText) return;
-  const currentRole = roles[roleIndex];
-  typedText.textContent = currentRole.slice(0, charIndex);
+let characterIndex = 0;
 
-  if (!isDeleting && charIndex < currentRole.length) {
-    charIndex += 1;
-    setTimeout(typeRole, typeSpeed);
-  } else if (isDeleting && charIndex > 0) {
-    charIndex -= 1;
-    setTimeout(typeRole, deleteSpeed);
-  } else {
-    if (!isDeleting) {
-      isDeleting = true;
-      setTimeout(typeRole, pauseDelay);
-    } else {
-      isDeleting = false;
-      roleIndex = (roleIndex + 1) % roles.length;
-      setTimeout(typeRole, typeSpeed);
+let deleting = false;
+/* =====================================================
+   UTILITY FUNCTIONS
+===================================================== */
+
+/* ---------- Current Year ---------- */
+
+function updateCurrentYear() {
+
+    if (currentYear) {
+
+        currentYear.textContent = new Date().getFullYear();
+
     }
-  }
+
 }
 
-function updateYear() {
-  if (currentYear) {
-    currentYear.textContent = new Date().getFullYear();
-  }
+/* ---------- Smooth Scroll ---------- */
+
+function smoothScroll(target) {
+
+    const element = document.querySelector(target);
+
+    if (!element) return;
+
+    window.scrollTo({
+
+        top: element.offsetTop - 80,
+
+        behavior: "smooth"
+
+    });
+
 }
 
-function toggleMobileNav() {
-  if (!navToggle || !mobileNav) return;
-  const expanded = navToggle.getAttribute('aria-expanded') === 'true';
-  navToggle.setAttribute('aria-expanded', String(!expanded));
-  mobileNav.classList.toggle('active');
-  mobileNav.setAttribute('aria-hidden', String(!mobileNav.classList.contains('active')));
+/* ---------- Debounce ---------- */
+
+function debounce(func, delay = 100) {
+
+    let timeout;
+
+    return (...args) => {
+
+        clearTimeout(timeout);
+
+        timeout = setTimeout(() => {
+
+            func.apply(this, args);
+
+        }, delay);
+
+    };
+
 }
 
-function closeMobileNav() {
-  if (!navToggle || !mobileNav) return;
-  navToggle.setAttribute('aria-expanded', 'false');
-  mobileNav.classList.remove('active');
-  mobileNav.setAttribute('aria-hidden', 'true');
+/* ---------- Throttle ---------- */
+
+function throttle(callback, delay = 100) {
+
+    let waiting = false;
+
+    return (...args) => {
+
+        if (waiting) return;
+
+        callback.apply(this, args);
+
+        waiting = true;
+
+        setTimeout(() => {
+
+            waiting = false;
+
+        }, delay);
+
+    };
+
 }
+
+/* ---------- Toggle Class ---------- */
+
+function toggleClass(element, className) {
+
+    if (!element) return;
+
+    element.classList.toggle(className);
+
+}
+
+/* ---------- Add Class ---------- */
+
+function addClass(element, className) {
+
+    if (!element) return;
+
+    element.classList.add(className);
+
+}
+
+/* ---------- Remove Class ---------- */
+
+function removeClass(element, className) {
+
+    if (!element) return;
+
+    element.classList.remove(className);
+
+}
+/* =====================================================
+   MOBILE NAVIGATION
+===================================================== */
+
+function openMobileMenu() {
+
+    if (!mobileNav || !navToggle) return;
+
+    mobileNav.classList.add("active");
+
+    navToggle.setAttribute("aria-expanded", "true");
+
+}
+
+function closeMobileMenu() {
+
+    if (!mobileNav || !navToggle) return;
+
+    mobileNav.classList.remove("active");
+
+    navToggle.setAttribute("aria-expanded", "false");
+
+}
+
+function toggleMobileMenu() {
+
+    if (!mobileNav) return;
+
+    mobileNav.classList.toggle("active");
+
+    const expanded = mobileNav.classList.contains("active");
+
+    navToggle.setAttribute("aria-expanded", expanded);
+
+}
+
+/* =====================================================
+   MOBILE NAV EVENTS
+===================================================== */
+
+function initialiseMobileNavigation() {
+
+    if (!navToggle || !mobileNav) return;
+
+    navToggle.addEventListener("click", (event) => {
+
+        event.stopPropagation();
+
+        toggleMobileMenu();
+
+    });
+
+    document.addEventListener("click", (event) => {
+
+        if (!mobileNav.classList.contains("active")) return;
+
+        if (
+
+            !mobileNav.contains(event.target) &&
+
+            !navToggle.contains(event.target)
+
+        ) {
+
+            closeMobileMenu();
+
+        }
+
+    });
+
+    mobileLinks.forEach(link => {
+
+        link.addEventListener("click", () => {
+
+            closeMobileMenu();
+
+        });
+
+    });
+
+    document.addEventListener("keydown", (event) => {
+
+        if (event.key === "Escape") {
+
+            closeMobileMenu();
+
+        }
+
+    });
+
+    window.addEventListener("resize", () => {
+
+        if (window.innerWidth > 900) {
+
+            closeMobileMenu();
+
+        }
+
+    });
+
+}
+/* =====================================================
+   STICKY HEADER
+===================================================== */
 
 function updateHeader() {
-  if (!header) return;
-  header.classList.toggle('shrink', window.scrollY > 30);
-}
 
-function updateActiveSection() {
-  const offset = window.innerHeight * 0.3;
-  sections.forEach((section) => {
-    const top = section.getBoundingClientRect().top;
-    const sectionId = section.id;
-    const isActive = top <= offset && top >= -section.offsetHeight + offset;
-    const link = document.querySelector(`.nav-list a[href="#${sectionId}"]`);
-    const mobileLink = document.querySelector(`.mobile-nav-list a[href="#${sectionId}"]`);
-    if (link) link.classList.toggle('active', isActive);
-    if (mobileLink) mobileLink.classList.toggle('active', isActive);
-  });
-}
+    if (!header) return;
 
-function attachMobileNav() {
-  if (!navToggle || !mobileNav) return;
+    if (window.scrollY > 50) {
 
-  // Build mobile nav from desktop links to avoid duplicated visible markup
-  function buildMobileNav() {
-    const mainNavList = document.querySelector('.nav-list');
-    if (!mainNavList || !mobileNav) return;
-    mobileNav.innerHTML = '';
-    const clone = mainNavList.cloneNode(true);
-    clone.classList.remove('nav-list');
-    clone.classList.add('mobile-nav-list');
-    mobileNav.appendChild(clone);
-    mobileNavLinks = mobileNav.querySelectorAll('.mobile-nav-list a');
-    // Attach click handlers to newly created mobile links to close menu on navigation
-    mobileNavLinks.forEach((link) => {
-      link.addEventListener('click', () => closeMobileNav());
-    });
-  }
+        header.classList.add("scrolled");
 
-  buildMobileNav();
+    } else {
 
-  navToggle.addEventListener('click', (e) => {
-    e.stopPropagation();
-    toggleMobileNav();
-  });
+        header.classList.remove("scrolled");
 
-  // mobile link handlers are attached during buildMobileNav()
-
-  // Close when clicking outside the mobile nav
-  document.addEventListener('click', (e) => {
-    if (!mobileNav.classList.contains('active')) return;
-    if (!mobileNav.contains(e.target) && !navToggle.contains(e.target)) {
-      closeMobileNav();
     }
-  });
 
-  // Close on Escape key
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeMobileNav();
-  });
-
-  // Ensure mobile menu is closed on resize to desktop
-  window.addEventListener('resize', () => {
-    if (window.innerWidth >= 768) {
-      closeMobileNav();
-      // rebuild to ensure no stale state
-      buildMobileNav();
-    }
-  });
 }
 
-function handleContactSubmission(event) {
-  if (!contactForm) return;
-  event.preventDefault();
+/* =====================================================
+   ACTIVE NAVIGATION
+===================================================== */
 
-  const name = document.getElementById('contact-name')?.value.trim();
-  const email = document.getElementById('contact-email')?.value.trim();
-  const phone = document.getElementById('contact-phone')?.value.trim();
-  const message = document.getElementById('contact-message')?.value.trim();
-  const submitButton = contactForm.querySelector('button[type="submit"]');
+function updateActiveNavigation() {
 
-  if (!name || !email || !message) {
-    contactFeedback.textContent = 'Please complete all required fields before sending.';
-    contactFeedback.classList.remove('success');
-    contactFeedback.classList.add('error');
-    return;
-  }
+    const scrollPosition = window.scrollY + 120;
 
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailPattern.test(email)) {
-    contactFeedback.textContent = 'Please enter a valid email address.';
-    contactFeedback.classList.remove('success');
-    contactFeedback.classList.add('error');
-    return;
-  }
+    sections.forEach(section => {
 
-  contactFeedback.textContent = '';
-  contactFeedback.classList.remove('error', 'success');
+        const sectionTop = section.offsetTop;
 
-  const endpoint = contactForm.action || localFormEndpoint;
+        const sectionHeight = section.offsetHeight;
 
-  if (submitButton) {
-    submitButton.disabled = true;
-    submitButton.textContent = 'Sending...';
-  }
+        const sectionId = section.getAttribute("id");
 
-  const replyToInput = contactForm.querySelector('input[name="_replyto"]');
-  if (replyToInput) replyToInput.value = email;
+        if (
 
-  const payload = {
-    name,
-    email,
-    phone,
-    message,
-    _subject: contactForm.querySelector('input[name="_subject"]')?.value || ''
-  };
+            scrollPosition >= sectionTop &&
 
-  fetch(endpoint, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    }
-  })
-    .then(async (response) => {
-      const contentType = response.headers.get('content-type') || '';
-      const data = contentType.includes('application/json') ? await response.json() : null;
+            scrollPosition < sectionTop + sectionHeight
 
-      if (!response.ok) {
-        throw new Error(data?.error || 'Unable to send message');
-      }
+        ) {
 
-      return data;
-    })
-    .then(() => {
-      contactFeedback.textContent = 'Message sent successfully. Thank you!';
-      contactFeedback.classList.remove('error');
-      contactFeedback.classList.add('success');
-      contactForm.reset();
-    })
-    .catch((error) => {
-      console.error('Contact submit error:', error);
-      contactFeedback.textContent = 'There was an issue sending your message. Please ensure the backend is running and try again.';
-      contactFeedback.classList.remove('success');
-      contactFeedback.classList.add('error');
-    })
-    .finally(() => {
-      if (submitButton) {
-        submitButton.disabled = false;
-        submitButton.textContent = 'Send Message';
-      }
-    });
-}
+            document
+                .querySelectorAll('.main-nav a, .mobile-nav a')
+                .forEach(link => {
 
-function setupContactForm() {
-  if (!contactForm) return;
-  contactForm.addEventListener('submit', handleContactSubmission);
-}
+                    link.classList.remove("active");
 
-function createScrollReveal() {
-  if (!window.IntersectionObserver || !revealElements.length) {
-    revealElements.forEach((element) => element.classList.add('reveal-visible'));
-    return;
-  }
+                });
 
-  const observer = new IntersectionObserver(
-    (entries, observerInstance) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('reveal-visible');
-          observerInstance.unobserve(entry.target);
+            const desktopLink = document.querySelector(
+                `.main-nav a[href="#${sectionId}"]`
+            );
+
+            const mobileLink = document.querySelector(
+                `.mobile-nav a[href="#${sectionId}"]`
+            );
+
+            if (desktopLink) {
+
+                desktopLink.classList.add("active");
+
+            }
+
+            if (mobileLink) {
+
+                mobileLink.classList.add("active");
+
+            }
+
         }
-      });
-    },
-    { threshold: 0.15 }
-  );
 
-  revealElements.forEach((element) => observer.observe(element));
+    });
+
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  updateYear();
-  attachMobileNav();
-  setupContactForm();
-  createScrollReveal();
-  typeRole();
-  updateHeader();
-  updateActiveSection();
+/* =====================================================
+   SMOOTH NAVIGATION
+===================================================== */
+
+function initialiseSmoothNavigation() {
+
+    document
+        .querySelectorAll('a[href^="#"]')
+        .forEach(link => {
+
+            link.addEventListener("click", function (event) {
+
+                const target = this.getAttribute("href");
+
+                if (target === "#") return;
+
+                event.preventDefault();
+
+                smoothScroll(target);
+
+            });
+
+        });
+
+}
+
+/* =====================================================
+   SCROLL EVENTS
+===================================================== */
+
+window.addEventListener(
+
+    "scroll",
+
+    throttle(() => {
+
+        updateHeader();
+
+        updateActiveNavigation();
+
+    }, 100)
+
+);
+/* =====================================================
+   TYPING ANIMATION
+===================================================== */
+
+function typeWriter() {
+
+    if (!typingElement) return;
+
+    const currentRole = roles[roleIndex];
+
+    if (!deleting) {
+
+        typingElement.textContent = currentRole.substring(
+
+            0,
+
+            characterIndex + 1
+
+        );
+
+        characterIndex++;
+
+        if (characterIndex === currentRole.length) {
+
+            deleting = true;
+
+            setTimeout(typeWriter, 1800);
+
+            return;
+
+        }
+
+        setTimeout(typeWriter, 90);
+
+    }
+
+    else {
+
+        typingElement.textContent = currentRole.substring(
+
+            0,
+
+            characterIndex - 1
+
+        );
+
+        characterIndex--;
+
+        if (characterIndex === 0) {
+
+            deleting = false;
+
+            roleIndex++;
+
+            if (roleIndex >= roles.length) {
+
+                roleIndex = 0;
+
+            }
+
+        }
+
+        setTimeout(typeWriter, 45);
+
+    }
+
+}
+
+/* =====================================================
+   CURSOR EFFECT
+===================================================== */
+
+function createTypingCursor() {
+
+    if (!typingElement) return;
+
+    const cursor = document.createElement("span");
+
+    cursor.className = "typing-cursor";
+
+    cursor.textContent = "|";
+
+    typingElement.after(cursor);
+
+}
+/* =====================================================
+   TYPING ANIMATION
+===================================================== */
+
+function typeWriter() {
+
+    if (!typingElement) return;
+
+    const currentRole = roles[roleIndex];
+
+    if (!deleting) {
+
+        typingElement.textContent = currentRole.substring(
+
+            0,
+
+            characterIndex + 1
+
+        );
+
+        characterIndex++;
+
+        if (characterIndex === currentRole.length) {
+
+            deleting = true;
+
+            setTimeout(typeWriter, 1800);
+
+            return;
+
+        }
+
+        setTimeout(typeWriter, 90);
+
+    }
+
+    else {
+
+        typingElement.textContent = currentRole.substring(
+
+            0,
+
+            characterIndex - 1
+
+        );
+
+        characterIndex--;
+
+        if (characterIndex === 0) {
+
+            deleting = false;
+
+            roleIndex++;
+
+            if (roleIndex >= roles.length) {
+
+                roleIndex = 0;
+
+            }
+
+        }
+
+        setTimeout(typeWriter, 45);
+
+    }
+
+}
+
+/* =====================================================
+   CURSOR EFFECT
+===================================================== */
+
+function createTypingCursor() {
+
+    if (!typingElement) return;
+
+    const cursor = document.createElement("span");
+
+    cursor.className = "typing-cursor";
+
+    cursor.textContent = "|";
+
+    typingElement.after(cursor);
+
+}
+/* =====================================================
+   SCROLL REVEAL
+===================================================== */
+
+function initialiseScrollReveal() {
+
+    if (!("IntersectionObserver" in window)) {
+
+        revealElements.forEach(element => {
+
+            element.classList.add("active");
+
+        });
+
+        return;
+
+    }
+
+    const observer = new IntersectionObserver(
+
+        (entries, observer) => {
+
+            entries.forEach(entry => {
+
+                if (entry.isIntersecting) {
+
+                    entry.target.classList.add("active");
+
+                    observer.unobserve(entry.target);
+
+                }
+
+            });
+
+        },
+
+        {
+
+            threshold:0.15,
+
+            rootMargin:"0px 0px -50px 0px"
+
+        }
+
+    );
+
+    revealElements.forEach(element => {
+
+        observer.observe(element);
+
+    });
+
+}
+
+/* =====================================================
+   SECTION STAGGER ANIMATION
+===================================================== */
+
+function staggerCards() {
+
+    const cards = document.querySelectorAll(
+
+        ".skill-card, .project-card, .contact-card, .certificate-card, .timeline-item"
+
+    );
+
+    cards.forEach((card,index)=>{
+
+        card.style.transitionDelay = `${index * 100}ms`;
+
+    });
+
+}
+/* =====================================================
+   BACK TO TOP BUTTON
+===================================================== */
+
+function initialiseBackToTop() {
+
+    if (!backToTop) return;
+
+    function toggleBackToTop() {
+
+        if (window.scrollY > 400) {
+
+            backToTop.classList.add("show");
+
+        } else {
+
+            backToTop.classList.remove("show");
+
+        }
+
+    }
+
+    window.addEventListener(
+
+        "scroll",
+
+        throttle(toggleBackToTop, 100)
+
+    );
+
+    backToTop.addEventListener("click", (event) => {
+
+        event.preventDefault();
+
+        window.scrollTo({
+
+            top: 0,
+
+            behavior: "smooth"
+
+        });
+
+    });
+
+}
+/* =====================================================
+   INITIALISE WEBSITE
+===================================================== */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    /* Current Year */
+    updateCurrentYear();
+
+    /* Navigation */
+    initialiseMobileNavigation();
+
+    initialiseSmoothNavigation();
+
+    /* Typing Animation */
+    createTypingCursor();
+
+    typeWriter();
+
+    /* Scroll Reveal */
+    initialiseScrollReveal();
+
+    staggerCards();
+
+    /* Back To Top */
+    initialiseBackToTop();
+
+    /* Initial Navigation State */
+    updateHeader();
+
+    updateActiveNavigation();
+
 });
 
-window.addEventListener('scroll', () => {
-  updateHeader();
-  updateActiveSection();
+/* =====================================================
+   WINDOW EVENTS
+===================================================== */
+
+window.addEventListener(
+
+    "scroll",
+
+    throttle(() => {
+
+        updateHeader();
+
+        updateActiveNavigation();
+
+    }, 100)
+
+);
+
+window.addEventListener(
+
+    "resize",
+
+    debounce(() => {
+
+        updateHeader();
+
+    }, 150)
+
+);
+
+/* =====================================================
+   PAGE LOADED
+===================================================== */
+
+window.addEventListener("load", () => {
+
+    document.body.classList.add("loaded");
+
 });
