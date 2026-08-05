@@ -19,6 +19,8 @@ const roles = [
   'Lifelong Learner'
 ];
 
+const localFormEndpoint = 'http://localhost:5001/submit-contact';
+
 let roleIndex = 0;
 let charIndex = 0;
 let isDeleting = false;
@@ -167,17 +169,7 @@ function handleContactSubmission(event) {
   contactFeedback.textContent = '';
   contactFeedback.classList.remove('error', 'success');
 
-  const hasPlaceholderAction = contactForm.action.includes('your-form-id');
-
-  if (hasPlaceholderAction) {
-    const subject = encodeURIComponent(`Portfolio inquiry from ${name}`);
-    const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nPhone: ${phone || 'Not provided'}\n\n${message}`);
-    window.location.href = `mailto:dinizjude@gmail.com?subject=${subject}&body=${body}`;
-    contactFeedback.textContent = 'Your email client is opening so you can send your message directly.';
-    contactFeedback.classList.remove('error');
-    contactFeedback.classList.add('success');
-    return;
-  }
+  const endpoint = contactForm.action || localFormEndpoint;
 
   if (submitButton) {
     submitButton.disabled = true;
@@ -187,26 +179,41 @@ function handleContactSubmission(event) {
   const replyToInput = contactForm.querySelector('input[name="_replyto"]');
   if (replyToInput) replyToInput.value = email;
 
-  fetch(contactForm.action, {
+  const payload = {
+    name,
+    email,
+    phone,
+    message,
+    _subject: contactForm.querySelector('input[name="_subject"]')?.value || ''
+  };
+
+  fetch(endpoint, {
     method: 'POST',
-    body: new FormData(contactForm),
+    body: JSON.stringify(payload),
     headers: {
+      'Content-Type': 'application/json',
       Accept: 'application/json'
     }
   })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.ok || data.success) {
-        contactFeedback.textContent = 'Message sent successfully. Thank you!';
-        contactFeedback.classList.remove('error');
-        contactFeedback.classList.add('success');
-        contactForm.reset();
-      } else {
-        throw new Error(data.error || 'Unable to send message');
+    .then(async (response) => {
+      const contentType = response.headers.get('content-type') || '';
+      const data = contentType.includes('application/json') ? await response.json() : null;
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Unable to send message');
       }
+
+      return data;
     })
-    .catch(() => {
-      contactFeedback.textContent = 'There was an issue sending your message. Please try again later or use email.';
+    .then(() => {
+      contactFeedback.textContent = 'Message sent successfully. Thank you!';
+      contactFeedback.classList.remove('error');
+      contactFeedback.classList.add('success');
+      contactForm.reset();
+    })
+    .catch((error) => {
+      console.error('Contact submit error:', error);
+      contactFeedback.textContent = 'There was an issue sending your message. Please ensure the backend is running and try again.';
       contactFeedback.classList.remove('success');
       contactFeedback.classList.add('error');
     })

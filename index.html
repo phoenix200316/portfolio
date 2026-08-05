@@ -11,7 +11,6 @@
   <link rel="canonical" href="https://phoenix200316.github.io/portfolio">
 
   <meta property="og:title" content="Jude Diniz | Software Developer & IT Professional">
-      <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation" aria-hidden="true"></nav>
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://phoenix200316.github.io/portfolio">
   <meta property="og:image" content="assets/images/og-image.svg">
@@ -416,8 +415,8 @@
           <h2 id="contact-heading">Connect for roles, projects, and support opportunities.</h2>
         </div>
         <div class="container contact-grid">
-          <form id="contact-form" class="contact-form" action="https://formspree.io/f/your-form-id" method="POST" aria-label="Contact form">
-            <p class="contact-note">This form is ready for Formspree. To enable submission, replace <strong>your-form-id</strong> in the form action with your Formspree endpoint. Until then, the form will open your email client for contact.</p>
+          <form id="contact-form" class="contact-form" action="http://localhost:5001/submit-contact" method="POST" aria-label="Contact form">
+            <p class="contact-note">This form saves messages into the local Excel workbook <strong>assets/contact info.xlsx</strong>. Run the included backend server before submitting the form.</p>
             <label for="contact-name">Name</label>
             <input type="text" id="contact-name" name="name" placeholder="Your full name" required>
             <label for="contact-email">Email</label>

@@ -83,6 +83,19 @@ The contact form is preconfigured for Formspree, but it requires a valid Formspr
 
 If the form action is not configured yet, the site will fallback to opening the default email client.
 
+## Local Backend
+
+If you run the local backend included in this repo, use the following:
+
+```powershell
+npm install
+npm start
+# open http://localhost:5001
+```
+
+- Submit the contact form on the site root or POST to `/submit-contact`.
+- Download collected contacts: GET `/download-contacts` (downloads `assets/contact info.csv`).
+
 ## Future Improvements
 
 - Add real portfolio project screenshots and case studies
